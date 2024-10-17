@@ -1,6 +1,7 @@
 package server
 
 import (
+	"docs/models"
 	"log"
 
 	"github.com/spf13/viper"
@@ -23,6 +24,9 @@ func InitDatabase(config *viper.Viper) *gorm.DB {
 		log.Fatalf("Error while initializing database: %v", err)
 	}
 
+	if err := db.AutoMigrate(&models.User{}); err != nil {
+		log.Fatalf("Error while migrating database: %v", err)
+	}
 	sqlDB, err := db.DB()
 	if err != nil {
 		log.Fatalf("Error while getting database instance: %v", err)

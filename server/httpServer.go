@@ -1,6 +1,9 @@
 package server
 
 import (
+	"docs/controllers"
+	"docs/repositories"
+	"docs/service"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -9,19 +12,27 @@ import (
 )
 
 type HttpServer struct {
-	config    *viper.Viper
-	router    *gin.Engine
-	dbHandler *gorm.DB
+	config         *viper.Viper
+	router         *gin.Engine
+	dbHandler      *gorm.DB
+	userController *controllers.UserHandler
 }
 
 func InitHttpServer(config *viper.Viper, dbHandler *gorm.DB) HttpServer {
 
+	userRepository := repositories.NewUserRepository(dbHandler)
+	userService := service.NewUserService(userRepository)
+	userController := controllers.NewUserHandler(userService)
+
 	router := gin.Default()
 
+	router.POST("/users", userController.CreateUser)
+
 	return HttpServer{
-		config:    config,
-		router:    router,
-		dbHandler: dbHandler,
+		config:         config,
+		router:         router,
+		dbHandler:      dbHandler,
+		userController: userController,
 	}
 }
 
