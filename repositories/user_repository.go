@@ -17,3 +17,12 @@ func NewUserRepository(db *gorm.DB) *UserRepository {
 func (r *UserRepository) CreateUser(user *models.User) error {
 	return r.db.Create(user).Error
 }
+
+func (r *UserRepository) GetUserByID(id uint) (*models.User, error) {
+	var user models.User
+	err := r.db.First(&user, id).Error
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}

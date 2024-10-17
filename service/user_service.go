@@ -25,3 +25,12 @@ func (s *UserService) CreateUser(username string) (*models.User, *models.Respons
 
 	return user, nil
 }
+
+func (s *UserService) GetUserByID(userID uint) (*models.User, *models.ResponseError) {
+	user, err := s.userRepo.GetUserByID(userID)
+	if err != nil {
+		return nil, models.NewResponseError("User not found", 404)
+	}
+
+	return user, nil
+}
