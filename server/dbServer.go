@@ -1,37 +1,42 @@
 package server
 
 import (
-	"database/sql"
 	"log"
 
 	"github.com/spf13/viper"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
-func InitDatabase(config *viper.Viper) *sql.DB {
+func InitDatabase(config *viper.Viper) *gorm.DB {
 	connectionString := config.GetString("database.connection_string")
 	maxIdleConnections := config.GetInt("database.max_idle_connections")
 	maxOpenConnections := config.GetInt("database.max_open_connections")
 	connectionMaxLifetime := config.GetDuration("database.connection_max_lifetime")
-	driverName := config.GetString("database.driver_name")
 
 	if connectionString == "" {
-		log.Fatalf("Database connectin string is missing")
+		log.Fatalf("Database connection string is missing")
 	}
 
-	dbHandler, err := sql.Open(driverName, connectionString)
+	db, err := gorm.Open(mysql.Open(connectionString), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("Error while initializing database: %v", err)
 	}
 
-	dbHandler.SetMaxIdleConns(maxIdleConnections)
-	dbHandler.SetMaxOpenConns(maxOpenConnections)
-	dbHandler.SetConnMaxLifetime(connectionMaxLifetime)
-
-	err = dbHandler.Ping()
+	sqlDB, err := db.DB()
 	if err != nil {
-		dbHandler.Close()
+		log.Fatalf("Error while getting database instance: %v", err)
+	}
+
+	sqlDB.SetMaxIdleConns(maxIdleConnections)
+	sqlDB.SetMaxOpenConns(maxOpenConnections)
+	sqlDB.SetConnMaxLifetime(connectionMaxLifetime)
+
+	err = sqlDB.Ping()
+	if err != nil {
+		sqlDB.Close()
 		log.Fatalf("Error while validating database: %v", err)
 	}
 
-	return dbHandler
+	return db
 }

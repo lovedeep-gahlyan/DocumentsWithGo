@@ -1,25 +1,27 @@
 package server
 
 import (
-	"database/sql"
 	"log"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
+	"gorm.io/gorm"
 )
 
 type HttpServer struct {
-	config *viper.Viper
-	router *gin.Engine
+	config    *viper.Viper
+	router    *gin.Engine
+	dbHandler *gorm.DB
 }
 
-func InitHttpServer(config *viper.Viper, dbHandler *sql.DB) HttpServer {
+func InitHttpServer(config *viper.Viper, dbHandler *gorm.DB) HttpServer {
 
 	router := gin.Default()
 
 	return HttpServer{
-		config: config,
-		router: router,
+		config:    config,
+		router:    router,
+		dbHandler: dbHandler,
 	}
 }
 

@@ -4,8 +4,6 @@ import (
 	"docs/config"
 	"docs/server"
 	"log"
-
-	_ "github.com/go-sql-driver/mysql"
 )
 
 func main() {
