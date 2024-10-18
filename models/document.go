@@ -5,6 +5,6 @@ type Document struct {
 	Name    string `json:"name"`
 	Content string `json:"content"`
 	OwnerID uint   `json:"owner_id"`
-	Owner   User   `gorm:"foreignKey:OwnerID"`
-	Users   []User `gorm:"many2many:document_users"`
+	Owner   User   `gorm:"foreignKey:OwnerID;constraint:OnDelete:CASCADE;"`
+	Users   []User `gorm:"many2many:document_users;constraint:OnDelete:CASCADE;"`
 }

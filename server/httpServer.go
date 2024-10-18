@@ -12,10 +12,11 @@ import (
 )
 
 type HttpServer struct {
-	config         *viper.Viper
-	router         *gin.Engine
-	dbHandler      *gorm.DB
-	userController *controllers.UserHandler
+	config             *viper.Viper
+	router             *gin.Engine
+	dbHandler          *gorm.DB
+	userController     *controllers.UserHandler
+	documentController *controllers.DocumentHandler
 }
 
 func InitHttpServer(config *viper.Viper, dbHandler *gorm.DB) HttpServer {
@@ -24,16 +25,22 @@ func InitHttpServer(config *viper.Viper, dbHandler *gorm.DB) HttpServer {
 	userService := service.NewUserService(userRepository)
 	userController := controllers.NewUserHandler(userService)
 
+	documentRepository := repositories.NewDocumentRepository(dbHandler)
+	documentService := service.NewDocumentService(documentRepository, userRepository)
+	documentController := controllers.NewDocumentHandler(documentService)
+
 	router := gin.Default()
 
 	router.POST("/users", userController.CreateUser)
 	router.GET("/users/:user_id", userController.GetUser)
+	router.POST("/users/:user_id/documents", documentController.CreateDocument)
 
 	return HttpServer{
-		config:         config,
-		router:         router,
-		dbHandler:      dbHandler,
-		userController: userController,
+		config:             config,
+		router:             router,
+		dbHandler:          dbHandler,
+		userController:     userController,
+		documentController: documentController,
 	}
 }
 

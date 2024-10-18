@@ -24,7 +24,7 @@ func InitDatabase(config *viper.Viper) *gorm.DB {
 		log.Fatalf("Error while initializing database: %v", err)
 	}
 
-	if err := db.AutoMigrate(&models.User{}); err != nil {
+	if err := db.AutoMigrate(&models.Document{}, &models.User{}); err != nil {
 		log.Fatalf("Error while migrating database: %v", err)
 	}
 	sqlDB, err := db.DB()
