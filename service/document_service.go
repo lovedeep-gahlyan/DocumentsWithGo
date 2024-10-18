@@ -76,3 +76,50 @@ func (s *DocumentService) DeleteDocument(docID, userID uint) *models.ResponseErr
 
 	return nil
 }
+
+func (s *DocumentService) GrantAccess(docID, ownerID, userID uint) *models.ResponseError {
+	doc, err := s.docRepo.GetDocumentByID(docID)
+	if err != nil {
+		return models.NewResponseError("Document not found", 404)
+	}
+
+	if doc.OwnerID != ownerID {
+		return models.NewResponseError("Unauthorized to grant access", 403)
+	}
+
+	user, err := s.userRepo.GetUserByID(userID)
+	if err != nil {
+		return models.NewResponseError("User not found", 404)
+	}
+
+	doc.Users = append(doc.Users, *user)
+	err = s.docRepo.UpdateDocument(doc)
+	if err != nil {
+		return models.NewResponseError("Error granting access", 500)
+	}
+
+	return nil
+}
+
+func (s *DocumentService) GetDocument(docID, userID uint) (*models.Document, *models.ResponseError) {
+	doc, err := s.docRepo.GetDocumentByID(docID)
+	if err != nil {
+		return nil, models.NewResponseError("Document not found", 404)
+	}
+
+	// Check if the user is the owner or has access
+	if doc.OwnerID != userID {
+		hasAccess := false
+		for _, user := range doc.Users {
+			if user.ID == userID {
+				hasAccess = true
+				break
+			}
+		}
+		if !hasAccess {
+			return nil, models.NewResponseError("Unauthorized access to document", 403)
+		}
+	}
+
+	return doc, nil
+}

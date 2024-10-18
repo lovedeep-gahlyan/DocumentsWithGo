@@ -36,6 +36,8 @@ func InitHttpServer(config *viper.Viper, dbHandler *gorm.DB) HttpServer {
 	router.POST("/users/:user_id/documents", documentController.CreateDocument)
 	router.PUT("/users/:user_id/documents/:doc_id", documentController.EditDocument)
 	router.DELETE("/users/:user_id/documents/:doc_id", documentController.DeleteDocument)
+	router.PUT("/users/:user_id/documents/:doc_id/grant/:target_user_id", documentController.GrantAccess)
+	router.GET("/users/:user_id/documents/:doc_id", documentController.GetDocument)
 
 	return HttpServer{
 		config:             config,
