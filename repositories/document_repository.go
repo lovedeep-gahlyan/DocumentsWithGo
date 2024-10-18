@@ -25,3 +25,11 @@ func (repo *DocumentRepository) GetDocumentByID(id uint) (*models.Document, erro
 	}
 	return &doc, nil
 }
+
+func (repo *DocumentRepository) UpdateDocument(doc *models.Document) error {
+	return repo.db.Save(doc).Error
+}
+
+func (repo *DocumentRepository) DeleteDocument(doc *models.Document) error {
+	return repo.db.Delete(doc).Error
+}
